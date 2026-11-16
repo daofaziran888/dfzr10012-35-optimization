@@ -22,5 +22,8 @@ from app.routers import metric as router_metric
 from app.routers import alarm as router_alarm
 from app.routers import udf as router_udf
 from app.routers import log as router_log
+from app.routers import log_archive as router_log_archive
 
-ROUTERS = [router_streamin, router_operator, router_window, router_state, router_checkpoint, router_backpress, router_latency, router_jobops, router_sink, router_schema, router_watermark, router_parallel, router_metric, router_alarm, router_udf, router_log]
+# log_archive 的前缀 /api/log/archive 必须先于 log 的 /api/log/{entry_id} 注册，
+# 否则 archive 会被当成 entry_id 做整数解析而返回 422。
+ROUTERS = [router_streamin, router_operator, router_window, router_state, router_checkpoint, router_backpress, router_latency, router_jobops, router_sink, router_schema, router_watermark, router_parallel, router_metric, router_alarm, router_udf, router_log_archive, router_log]

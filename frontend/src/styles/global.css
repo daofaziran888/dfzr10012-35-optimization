@@ -33,3 +33,15 @@ body { margin: 0; background: #f6f8fb; color: #1f2937; }
 .link { border: none; background: none; color: var(--brand); cursor: pointer; padding: 0; }
 .page-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--muted); }
 .error-text { color: #b42318; }
+
+/* 日志归档游标迁移面板 */
+.archive-panel { margin-top: 28px; padding-top: 16px; border-top: 2px dashed var(--border); }
+.archive-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.archive-actions .btn:disabled { opacity: .55; cursor: not-allowed; }
+.archive-message { font-size: 13px; color: #067647; background: #ecfdf3; border: 1px solid #abefc6; border-radius: 6px; padding: 6px 10px; }
+.archive-warning { font-size: 13px; color: #b42318; background: #fef3f2; border: 1px solid #fda29b; border-radius: 6px; padding: 6px 10px; margin-bottom: 10px; }
+.stat-cursor { font-size: 13px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; word-break: break-all; }
+.archive-meta { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+.archive-meta h4 { margin: 0 0 6px; font-size: 13px; }
+.archive-meta ul { margin: 0; padding-left: 18px; font-size: 12px; color: var(--muted); max-height: 160px; overflow: auto; }
+.archive-meta li { margin-bottom: 4px; word-break: break-all; }

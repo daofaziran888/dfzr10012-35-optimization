@@ -73,5 +73,37 @@ npm run dev
 - 列表接口统一返回 `{ items, total, page, size }`，动作接口统一返回 `{ ok, message }`。
 - 状态流转只允许在 `app/services` 里改，路由层不做业务判断。
 
+## 日志归档游标迁移（行号 → 事件时间偏移）
+
+流处理日志中心（`log`）的归档游标已从旧行号（`row-101/205/309`）迁移到事件时间
+偏移（`event-offset=<毫秒时间戳>`），核心实现在：
+
+- `backend/app/services/log_archive.py`：归档迁移引擎与异常归档数据索引（单例，
+  迁移入口与消费入口共用同一份索引）
+- `backend/app/routers/log_archive.py`：迁移、续做、消费、旧游标解析、导入/导出接口
+- `frontend/src/views/log/ArchivePanel.tsx`：迁移操作与索引核对面板
+
+关键约束：
+
+- 旧行号游标必须映射到**唯一**事件时间偏移后才能继续读取，映射表在迁移完成后冻结，
+  历史归档记录按原映射兼容（`row_to_offset_mapping` + `mapping_frozen`）。
+- 异常归档数据索引的每条记录都保留三个游标字段：`event_offset`（事件偏移）、
+  `processed_cursor`（已处理游标）、`resume_position`（续做位置），并附带日志内容、
+  异常类型、处理状态与事件时间校验结论。
+- 同一归档的并发迁移只生效一次：状态机 `未迁移 → 迁移中 → 已中断/已完成`，终态唯一；
+  中断后只允许走续做入口，从 `resume_position` 继续，不重读已归档区间，已完成文件保留。
+- 旧行号与新偏移指向不同位置产生冲突时，只承认来源明确的唯一索引（冲突记录在
+  `conflicts`）；导入/导出/上传/下载逐项核对内容与 SHA-256 checksum。
+- 验收样例：LOG-0001~LOG-0003 对应 `row-101/205/309`，迁移在 `row-205` 中断后
+  续做位置为 `row-206`，续做只补归档 `row-309`。
+
+验收脚本（纯标准库，`-I` 隔离运行）：
+
+```bash
+cd backend
+.venv/bin/python -I scripts/verify_log_archive.py        # 服务级规则验收（36 项）
+.venv/bin/python -I scripts/verify_log_archive_http.py   # 真实 uvicorn 接口验收（18 项）
+```
+
 领域：数据工程
 子方向：数仓与数据湖

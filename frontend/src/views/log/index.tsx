@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { request } from '@/api/client'
+import ArchivePanel from './ArchivePanel'
 
 const ENDPOINT = '/api/log'
 const columns = [
@@ -152,6 +153,8 @@ export default function LogView() {
           )}
         </tbody>
       </table>
+
+      <ArchivePanel />
 
       <footer className="page-foot">
         <span>共 {total} 条流处理日志中心记录</span>
